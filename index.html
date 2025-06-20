@@ -5,17 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>No-Equipment Workout Tracker</title>
   <style>
+    :root {
+      --bg: #f2f2f2;
+      --card: #fff;
+      --text: #000;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #121212;
+        --card: #1e1e1e;
+        --text: #f9f9f9;
+      }
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 1rem;
-      background: #f2f2f2;
+      background: var(--bg);
+      color: var(--text);
     }
     h1, h2 {
       text-align: center;
     }
     .section {
-      background: #fff;
+      background: var(--card);
       padding: 1rem;
       margin-bottom: 1rem;
       border-radius: 8px;
@@ -35,12 +50,39 @@
       text-align: center;
       margin-top: 2rem;
       font-size: 0.9rem;
-      color: #666;
+      color: #999;
+    }
+    .timer-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #007BFF;
+      color: white;
+    }
+    .timer-display {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
   <h1>🏋️‍♂️ Full Body Workout</h1>
+  <div class="timer-display" id="timer">00:00</div>
+  <div class="timer-controls">
+    <button onclick="startTimer()">Start</button>
+    <button onclick="pauseTimer()">Pause</button>
+    <button onclick="resetTimer()">Reset</button>
+  </div>
+
   <div class="section">
     <h2>Workout Format</h2>
     <p>Work: <strong>40s</strong> | Rest: <strong>20s</strong></p>
@@ -74,7 +116,49 @@
   </div>
 
   <footer>
-    Stay consistent and listen to your body 💪
+    Stay consistent and listen to your body 💪<br>
+    This page is installable as a PWA – add it to your home screen!
   </footer>
+
+  <script>
+    let timer;
+    let totalSeconds = 0;
+    let running = false;
+
+    function updateDisplay() {
+      const mins = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const secs = String(totalSeconds % 60).padStart(2, '0');
+      document.getElementById('timer').textContent = `${mins}:${secs}`;
+    }
+
+    function startTimer() {
+      if (running) return;
+      running = true;
+      timer = setInterval(() => {
+        totalSeconds++;
+        updateDisplay();
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timer);
+      running = false;
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      running = false;
+      totalSeconds = 0;
+      updateDisplay();
+    }
+  </script>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
 </body>
 </html>
